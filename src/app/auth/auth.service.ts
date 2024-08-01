@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { User } from './user.model';
+import { Router } from '@angular/router';
 
 export interface AuthResponseData {
     kind: string;
@@ -20,7 +21,7 @@ export class AuthService {
   private API_KEY: string = 'AIzaSyB2iaMLilYMe_xk3tjTAieEqFxEW1shKrg';
   user = new BehaviorSubject<User>(null);
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, private router: Router) {}
 
   signup(email: string, password: string) {
     return this.httpClient
@@ -55,6 +56,11 @@ export class AuthService {
         this.handleAuthentication(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
       })
     );
+  }
+
+  logout() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
   }
 
   private handleAuthentication(email: string, userId: string, token: string, expiresIn: number) {
